@@ -16,8 +16,10 @@ fn main() {
         let user_option = menu_choice::get_menu_option();
         match user_option {
             MenuChoice::D6 => {
-                println!("{}", dice_generation::generate_dice_result(1, 6))
-            }
+                let result = dice_generation::generate_dice_result(1, 6);
+                ascii_graphics::display_standard_dice(result as u8);
+                // println!("The result: {}", dice_generation::generate_dice_result(1, 6))
+            },
             MenuChoice::RandomDiceUserInputRange => {
                 println!("Enter the lowest value (included): ");
                 let lowest = get_valid_int::<i8>(i8::MIN, i8::MAX);
@@ -27,10 +29,10 @@ fn main() {
                     "The result: {}",
                     dice_generation::generate_dice_result(lowest, highest)
                 )
-            }
+            },
             MenuChoice::Exit => {
                 break 'main_loop;
-            }
+            },
         }
     }
 

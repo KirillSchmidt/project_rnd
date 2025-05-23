@@ -20,8 +20,8 @@ pub fn index_to_choice(index: usize) -> Option<MenuChoice> {
 }
 
 pub fn choice_to_index(choice: MenuChoice) -> Option<u8> {
-    for i in 0..LEN_OF_ALL_OPTIONS {
-        if ALL_OPTIONS[i] == choice {
+    for (i, i_choice) in ALL_OPTIONS.iter().enumerate().take(LEN_OF_ALL_OPTIONS) {
+        if i_choice == &choice {
             return Some(i as u8);
         }
     }
@@ -36,6 +36,7 @@ pub fn print_all_menu_options() {
         match option {
             MenuChoice::D6 => print!("Throw a D6 (regular dice)"),
             MenuChoice::RandomDiceUserInputRange => print!("Throw a custom dice"),
+
             MenuChoice::Exit => print!("Exit"),
         }
         println!();
@@ -49,7 +50,7 @@ pub fn get_menu_option() -> MenuChoice {
     match index_to_choice((user_int - 1) as usize) {
         Some(choice) => return choice,
         None => {
-            todo!("Did not expect to get invalid range of index")
+            panic!("Did not expect to get invalid range of index")
         }
     }
 }

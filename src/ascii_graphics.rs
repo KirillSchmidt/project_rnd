@@ -1,28 +1,27 @@
-// pub fn display_dice_result<I: PartialOrd + ToString>(result_to_show: I) {
-//     let int_length = result_to_show.to_string().len();
-//     let max_bound = int_length + 4; // length + 2 spaces + 2 chars of |
-//     for row in 0..=max_bound {
-//         for column in 0..=max_bound {
-//             if row == 0 || row == max_bound { // the top or the bottom
-//                 print!("—")
-//             } else if column == 0 || column == max_bound { // left-most or right-most
-//                 print!("|")
-//             } else if column == max_bound + 2 && row == { // place for the result to show
-//                 todo!()
-//             } else {
-//                 print!(" ");
-//             }
-//         }
-//         println!();
-//     }
-//     println!();
-// }
-//
-// /*
-//
-// ———————————
-// |
-// |   3     |
-// |
-// ————————————
-//  */
+use std::num::NonZeroU32;
+use artem::config::Config;
+use artem::ConfigBuilder;
+use image;
+
+fn create_config() -> Config {
+    let mut builder = ConfigBuilder::new();
+    builder.target_size(NonZeroU32::new(50).unwrap());
+    builder.scale(0.35 as f32);
+    return builder.build();
+}
+
+
+pub fn display_standard_dice(side: u8) {
+    assert!(1 <= side && side <= 6);
+    let filepath = format!("resources/img/face-{side}.jpeg");
+    std::fs::exists(&filepath).unwrap();
+    let img = image::open(filepath).expect("Failed to open an image");
+    let ascii_art = artem::convert(img, &create_config());
+    println!("{}", ascii_art);
+}
+
+pub fn test_artem() {
+    for i in 1..=6 {
+        display_standard_dice(i);
+    }
+}

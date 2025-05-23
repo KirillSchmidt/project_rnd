@@ -1,4 +1,6 @@
-/target
+resources/img/*
+!resources/img/face-*.jpeg
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/rust,clion+all,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=rust,clion+all,macos
