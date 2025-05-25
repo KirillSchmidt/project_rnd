@@ -32,10 +32,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let menu_items = vec!["Random Number", "Flip Coin", "Roll Dice", "Exit"];
+    // let menu_items = vec!["Random Number", "Flip Coin", "Roll Dice", "Exit"];
+    let mut menu_items: Vec<String> = vec![];
+    menu_items.reserve_exact(menu_choice::LEN_OF_ALL_OPTIONS);
+    for opt in &menu_choice::ALL_OPTIONS {
+        menu_items.push(menu_choice::choice_to_text(*opt))
+    }
     let menu: Vec<ListItem> = menu_items
         .iter()
-        .map(|&item| ListItem::new(Line::from(vec![Span::raw(item)])))
+        .map(|item| ListItem::new(Line::from(vec![Span::raw(item)])))
         .collect();
 
     loop {
