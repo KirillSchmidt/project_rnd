@@ -6,8 +6,8 @@ pub enum MenuChoice {
     Exit,
 }
 
-const LEN_OF_ALL_OPTIONS: usize = 4;
-const ALL_OPTIONS: [MenuChoice; LEN_OF_ALL_OPTIONS] = [
+pub const LEN_OF_ALL_OPTIONS: usize = 4;
+pub const ALL_OPTIONS: [MenuChoice; LEN_OF_ALL_OPTIONS] = [
     MenuChoice::CoinFlip,
     MenuChoice::D6,
     MenuChoice::RandomDiceUserInputRange,
@@ -30,19 +30,22 @@ pub fn choice_to_index(choice: MenuChoice) -> Option<u8> {
     return None;
 }
 
+pub fn choice_to_text(choice: MenuChoice) -> String {
+    return match choice {
+        MenuChoice::D6 => String::from("Throw a D6 (regular dice)"),
+        MenuChoice::CoinFlip => String::from("Flip a coin"),
+        MenuChoice::RandomDiceUserInputRange => String::from("Throw a custom dice"),
+
+        MenuChoice::Exit => String::from("Exit"),
+    }
+}
+
 pub fn print_all_menu_options() {
     for i in 0..ALL_OPTIONS.len() {
         print!("{}. ", i + 1);
-        let option =
+        let i_option =
             index_to_choice(i).expect("Invalid index for MenuChoice. Potential out-of-bounds");
-        match option {
-            MenuChoice::D6 => print!("Throw a D6 (regular dice)"),
-            MenuChoice::CoinFlip => print!("Flip a coin"),
-            MenuChoice::RandomDiceUserInputRange => print!("Throw a custom dice"),
-
-            MenuChoice::Exit => print!("Exit"),
-        }
-        println!();
+        println!("{}", choice_to_text(i_option));
     }
     println!();
 }
