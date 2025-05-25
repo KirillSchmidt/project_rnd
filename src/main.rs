@@ -1,11 +1,13 @@
-mod dice_generation;
 mod ascii_graphics;
+mod dice_generation;
 mod menu_choice;
 
 use menu_choice::MenuChoice;
 use std::io::Write;
 use std::process::exit;
 use std::str::FromStr;
+
+// TODO: add D&D mode (exact set of dice, nat 0 / nat 20, etc.)
 
 fn main() {
     menu_choice::print_all_menu_options();
@@ -17,9 +19,10 @@ fn main() {
         match user_option {
             MenuChoice::D6 => {
                 let result = dice_generation::generate_dice_result(1, 6);
+                // made a separate value for future debugging, the compiler will optimise it anyway
                 ascii_graphics::display_standard_dice(result as u8);
                 // println!("The result: {}", dice_generation::generate_dice_result(1, 6))
-            },
+            }
             MenuChoice::RandomDiceUserInputRange => {
                 println!("Enter the lowest value (included): ");
                 let lowest = get_valid_int::<i8>(i8::MIN, i8::MAX);
@@ -29,10 +32,14 @@ fn main() {
                     "The result: {}",
                     dice_generation::generate_dice_result(lowest, highest)
                 )
-            },
+            }
+            MenuChoice::CoinFlip => {
+                let is_heads = dice_generation::generate_dice_result(0, 1) == 0;
+                println!("It's {}", if is_heads { "heads" } else { "tails" })
+            }
             MenuChoice::Exit => {
                 break 'main_loop;
-            },
+            }
         }
     }
 

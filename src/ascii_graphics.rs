@@ -1,7 +1,7 @@
-use std::num::NonZeroU32;
 use artem::config::Config;
 use artem::ConfigBuilder;
 use image;
+use std::num::NonZeroU32;
 
 fn create_config() -> Config {
     let mut builder = ConfigBuilder::new();
@@ -9,7 +9,6 @@ fn create_config() -> Config {
     builder.scale(0.35 as f32);
     return builder.build();
 }
-
 
 pub fn display_standard_dice(side: u8) {
     assert!(1 <= side && side <= 6);

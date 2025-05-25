@@ -1,12 +1,14 @@
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum MenuChoice {
+    CoinFlip,
     D6,
     RandomDiceUserInputRange,
     Exit,
 }
 
-const LEN_OF_ALL_OPTIONS: usize = 3;
+const LEN_OF_ALL_OPTIONS: usize = 4;
 const ALL_OPTIONS: [MenuChoice; LEN_OF_ALL_OPTIONS] = [
+    MenuChoice::CoinFlip,
     MenuChoice::D6,
     MenuChoice::RandomDiceUserInputRange,
     MenuChoice::Exit,
@@ -35,6 +37,7 @@ pub fn print_all_menu_options() {
             index_to_choice(i).expect("Invalid index for MenuChoice. Potential out-of-bounds");
         match option {
             MenuChoice::D6 => print!("Throw a D6 (regular dice)"),
+            MenuChoice::CoinFlip => print!("Flip a coin"),
             MenuChoice::RandomDiceUserInputRange => print!("Throw a custom dice"),
 
             MenuChoice::Exit => print!("Exit"),
