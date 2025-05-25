@@ -1,6 +1,7 @@
 mod ascii_graphics;
 mod dice_generation;
 mod menu_choice;
+mod trying_ratatui;
 
 use menu_choice::MenuChoice;
 use std::io::Write;
@@ -9,42 +10,76 @@ use std::str::FromStr;
 
 // TODO: add D&D mode (exact set of dice, nat 0 / nat 20, etc.)
 
-fn main() {
-    menu_choice::print_all_menu_options();
+use std::io;
+use crossterm::{
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
+use ratatui::{
+    backend::CrosstermBackend,
+    layout::{Constraint, Direction, Layout},
+    style::{Modifier, Style},
+    text::{Span, Line},
+    widgets::{Block, Borders, List, ListItem, Paragraph},
+    Terminal,
+};
 
-    'main_loop: loop {
-        print!("Enter the menu choice: ");
-        std::io::stdout().flush().expect("Can't flush the stdout");
-        let user_option = menu_choice::get_menu_option();
-        match user_option {
-            MenuChoice::D6 => {
-                let result = dice_generation::generate_dice_result(1, 6);
-                // made a separate value for future debugging, the compiler will optimise it anyway
-                ascii_graphics::display_standard_dice(result as u8);
-                // println!("The result: {}", dice_generation::generate_dice_result(1, 6))
-            }
-            MenuChoice::RandomDiceUserInputRange => {
-                println!("Enter the lowest value (included): ");
-                let lowest = get_valid_int::<i8>(i8::MIN, i8::MAX);
-                println!("Enter the highest value (included): ");
-                let highest = get_valid_int::<i8>(lowest + 1, i8::MAX);
-                println!(
-                    "The result: {}",
-                    dice_generation::generate_dice_result(lowest, highest)
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    enable_raw_mode()?;
+    let mut stdout = io::stdout();
+    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+
+    let menu_items = vec!["Random Number", "Flip Coin", "Roll Dice", "Exit"];
+    let menu: Vec<ListItem> = menu_items
+        .iter()
+        .map(|&item| ListItem::new(Line::from(vec![Span::raw(item)])))
+        .collect();
+
+    loop {
+        terminal.draw(|f| {
+            let area = f.area();
+
+            let chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .margin(1)
+                .constraints(
+                    [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
                 )
-            }
-            MenuChoice::CoinFlip => {
-                let is_heads = dice_generation::generate_dice_result(0, 1) == 0;
-                println!("It's {}", if is_heads { "heads" } else { "tails" })
-            }
-            MenuChoice::Exit => {
-                break 'main_loop;
+                .split(area);
+
+            let menu_list = List::new(menu.clone())
+                .block(Block::default().title(" Menu ").borders(Borders::ALL))
+                .highlight_style(Style::default().add_modifier(Modifier::BOLD));
+
+            f.render_widget(menu_list, chunks[0]);
+
+            let main_panel = Paragraph::new("Welcome to RNG Terminal!")
+                .block(Block::default().title(" Output ").borders(Borders::ALL));
+
+            f.render_widget(main_panel, chunks[1]);
+        })?;
+
+        if crossterm::event::poll(std::time::Duration::from_millis(100))? {
+            if let Event::Key(key) = event::read()? {
+                if key.code == KeyCode::Char('q') {
+                    break;
+                }
             }
         }
     }
 
-    println!("Exiting...");
-    exit(0);
+    disable_raw_mode()?;
+    execute!(
+        terminal.backend_mut(),
+        LeaveAlternateScreen,
+        DisableMouseCapture
+    )?;
+    terminal.show_cursor()?;
+
+    Ok(())
 }
 
 fn print_and_flush(str_to_print: &str) {
