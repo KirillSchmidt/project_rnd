@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::Formatter;
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum MenuChoice {
     CoinFlip,
@@ -29,14 +32,16 @@ pub fn choice_to_index(choice: MenuChoice) -> Option<u8> {
     }
     return None;
 }
+impl fmt::Display for MenuChoice {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            MenuChoice::D6 => "Throw a D6 (regular dice)",
+            MenuChoice::CoinFlip => "Flip a coin",
+            MenuChoice::RandomDiceUserInputRange => "Throw a custom dice",
 
-pub fn choice_to_text(choice: MenuChoice) -> String {
-    return match choice {
-        MenuChoice::D6 => String::from("Throw a D6 (regular dice)"),
-        MenuChoice::CoinFlip => String::from("Flip a coin"),
-        MenuChoice::RandomDiceUserInputRange => String::from("Throw a custom dice"),
-
-        MenuChoice::Exit => String::from("Exit"),
+            MenuChoice::Exit => "Exit",
+        };
+        return write!(f, "{}", s);
     }
 }
 
@@ -45,7 +50,7 @@ pub fn print_all_menu_options() {
         print!("{}. ", i + 1);
         let i_option =
             index_to_choice(i).expect("Invalid index for MenuChoice. Potential out-of-bounds");
-        println!("{}", choice_to_text(i_option));
+        println!("{}", i_option);
     }
     println!();
 }
