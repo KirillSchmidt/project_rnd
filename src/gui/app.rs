@@ -3,7 +3,7 @@ use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
-    style::{Modifier, Style},
+    style::{Modifier, Style, Stylize},
     symbols::border,
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, ListState, Paragraph, StatefulWidget, Widget},
@@ -130,17 +130,17 @@ impl StatefulWidget for &App {
     type State = ListState;
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
         let menu_title = Line::from("Menu");
-        // let instructions = Line::from(vec![
-        //     " Up ".into(),
-        //     "<ArrowUp>/<k>".blue().bold(),
-        //     " Down ".into(),
-        //     "<ArrowDown>/<j>".blue().bold(),
-        //     " Quit ".into(),
-        //     "<q>".bold().blue(),
-        // ]);
+        let instructions = Line::from(vec![
+            " Up ".into(),
+            "<ArrowUp>/<k>".blue().bold(),
+            " Down ".into(),
+            "<ArrowDown>/<j>".blue().bold(),
+            " Quit ".into(),
+            "<q>".bold().blue(),
+        ]);
         let menu_block = Block::bordered()
             .title(menu_title.centered())
-            // .title_bottom(instructions.centered())
+            .title_bottom(instructions.centered())
             .border_set(border::THICK);
 
         let chunks = Layout::default()
