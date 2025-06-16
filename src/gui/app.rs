@@ -9,9 +9,10 @@ use ratatui::{
     widgets::{Block, Borders, List, ListItem, ListState, Paragraph, StatefulWidget, Widget},
     DefaultTerminal, Frame,
 };
+use std::cmp::PartialEq;
 use std::io;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, PartialEq)]
 pub enum AppState {
     #[default]
     Menu,
@@ -114,14 +115,12 @@ impl App {
     fn next_option(&mut self) {
         if self.selected != self.menu_items.len() - 1 {
             self.selected += 1
-        } else {
         }
     }
 
     fn prev_option(&mut self) {
         if self.selected != 0 {
             self.selected -= 1;
-        } else {
         }
     }
 }
@@ -138,11 +137,12 @@ impl StatefulWidget for &App {
             " Quit ".into(),
             "<q>".bold().blue(),
         ]);
-        let menu_block = Block::bordered()
+        let mut menu_block = Block::bordered()
             .title(menu_title.centered())
-            .title_bottom(instructions.centered())
-            .border_set(border::THICK);
-
+            .title_bottom(instructions.centered());
+        if self.state == AppState::Menu {
+            menu_block = menu_block.border_set(border::THICK);
+        }
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
             .margin(1)
@@ -173,12 +173,14 @@ impl StatefulWidget for &App {
             AppState::InputCustomDice { buffer } => format!("Enter number of sides: {}", &buffer),
         };
         // Render output pane
+        let mut output_block = Block::default()
+            .title("RNG Terminal by KS")
+            .borders(Borders::ALL);
+        if self.state != AppState::Menu {
+            output_block = output_block.border_set(border::THICK);
+        }
         Paragraph::new(main_text)
-            .block(
-                Block::default()
-                    .title("RNG Terminal by KS")
-                    .borders(Borders::ALL),
-            )
+            .block(output_block)
             .render(chunks[1], buf);
     }
 }
