@@ -33,7 +33,7 @@ pub const ALL_OPTIONS: [MenuChoice; LEN_OF_ALL_OPTIONS] = [
 pub fn get_all_menu_strings() -> Vec<String> {
     let mut all_options: Vec<String> = vec![];
     all_options.reserve_exact(LEN_OF_ALL_OPTIONS);
-    let mut opt_iter = ALL_OPTIONS.iter();
+    let opt_iter = ALL_OPTIONS.iter();
     for opt in opt_iter {
         all_options.push(opt.to_string());
     }

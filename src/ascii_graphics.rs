@@ -1,6 +1,5 @@
 use artem::config::Config;
 use artem::ConfigBuilder;
-use image;
 use std::num::NonZeroU32;
 
 fn create_config() -> Config {

@@ -4,9 +4,6 @@ mod gui;
 mod helper_functions;
 mod menu_choice;
 
-use std::io::Write;
-use std::str::FromStr;
-
 // TODO: add D&D mode (exact set of dice, nat 0 / nat 20, etc.)
 
 use crossterm::{
