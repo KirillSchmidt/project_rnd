@@ -1,4 +1,3 @@
-mod ascii_graphics;
 mod dice_generation;
 mod gui;
 mod helper_functions;

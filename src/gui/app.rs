@@ -93,11 +93,18 @@ impl App {
                 }
                 KeyCode::Enter => {
                     if let Ok(max_val) = buffer.parse::<u8>() {
-                        self.output = format!(
-                            "Custom Dice ({}): {}",
-                            max_val,
-                            dice_generation::generate_dice_result(1, max_val as i8)
-                        );
+                        match dice_generation::custom_dice(max_val as i8) {
+                            Ok(value) => {
+                                self.output = format!(
+                                    "Custom Dice ({}): {}",
+                                    max_val,
+                                    value,
+                                );
+                            }
+                            Err(err_string) => {
+                                self.output = err_string;
+                            }
+                        }
                     } else {
                         self.output = "Invalid number".into();
                     }
