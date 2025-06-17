@@ -70,9 +70,9 @@ impl App {
         Ok(())
     }
 
-    fn set_state(&mut self, new_state: AppState) {
-        self.state = new_state;
-    }
+    // fn set_state(&mut self, new_state: AppState) {
+    //     self.state = new_state;
+    // }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match &mut self.state {
@@ -101,7 +101,7 @@ impl App {
             AppState::InputCustomDice {
                 buffer,
                 min,
-                max,
+                max: _,
                 min_is_set,
                 max_is_set,
             } => match key_event.code {
