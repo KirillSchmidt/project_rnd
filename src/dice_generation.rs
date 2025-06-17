@@ -18,21 +18,19 @@ pub fn standard_dice() -> u8 {
     return generate_dice_result(1, 6) as u8;
 }
 
-pub fn custom_dice(side: i8) -> Result<i8, String> {
-    if side <= 0 {
-        return Err("The value should be larger than 0".into());
+pub fn custom_dice(min: i8, max: i8) -> Result<i8, String> {
+    return if min > max {
+        Err("Min should be less than max".into())
+    } else if min == max {
+        Err(format!(
+            "If you make min = max, the result is the value itself ({} in your case)",
+            min
+        ))
+    } else if max == min + 1 {
+        Err(format!("You might as well just flip a coin\n(it's {} btw)", generate_dice_result(min, max)))
+    } else if max == min + 5 {
+        Err(format!("You might as well just use a standard dice\n(it's {} btw)", generate_dice_result(min, max)))
+    } else {
+        Ok(generate_dice_result(min, max))
     }
-    let result = generate_dice_result(1, side);
-    if side > 2 {
-        return Ok(result);
-    }
-    // Let the fun begin!
-    let mut funny_error_msg = String::new();
-    if side == 1 {
-        funny_error_msg.push_str("It doesn't make any sense! It will always be equal to 1");
-    } else if side == 2 {
-        funny_error_msg.push_str("Just use the 'Flip a coin' option...");
-    }
-    funny_error_msg += &format!("\n(it's {} btw)", result);
-    return Err(funny_error_msg);
 }

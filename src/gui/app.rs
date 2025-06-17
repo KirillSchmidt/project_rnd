@@ -18,6 +18,10 @@ pub enum AppState {
     Menu,
     InputCustomDice {
         buffer: String,
+        min: i8,
+        max: i8,
+        min_is_set: bool,
+        max_is_set: bool,
     },
 }
 
@@ -66,6 +70,10 @@ impl App {
         Ok(())
     }
 
+    fn set_state(&mut self, new_state: AppState) {
+        self.state = new_state;
+    }
+
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match &mut self.state {
             AppState::Menu => match key_event.code {
@@ -78,6 +86,10 @@ impl App {
                     2 => {
                         self.state = AppState::InputCustomDice {
                             buffer: String::new(),
+                            min: i8::MIN,
+                            max: i8::MAX,
+                            min_is_set: false,
+                            max_is_set: false,
                         };
                         self.output.clear();
                     }
@@ -86,29 +98,47 @@ impl App {
                 },
                 _ => {}
             },
-            AppState::InputCustomDice { buffer } => match key_event.code {
-                KeyCode::Char(c) if c.is_ascii_digit() => buffer.push(c),
+            AppState::InputCustomDice {
+                buffer,
+                min,
+                max,
+                min_is_set,
+                max_is_set,
+            } => match key_event.code {
+                KeyCode::Char(c) if c.is_ascii_digit() => buffer.push(c), // TODO: add the ability to enter a negative value
                 KeyCode::Backspace => {
                     buffer.pop();
                 }
                 KeyCode::Enter => {
-                    if let Ok(max_val) = buffer.parse::<u8>() {
-                        match dice_generation::custom_dice(max_val as i8) {
-                            Ok(value) => {
-                                self.output = format!(
-                                    "Custom Dice ({}): {}",
-                                    max_val,
-                                    value,
-                                );
-                            }
-                            Err(err_string) => {
-                                self.output = err_string;
-                            }
+                    if !*min_is_set {
+                        if let Ok(min_val) = buffer.parse::<i8>() {
+                            *min = min_val;
+                            *min_is_set = true;
+                            buffer.clear();
+                        } else {
+                            self.output = "Invalid number".into();
+                            self.state = AppState::Menu;
                         }
-                    } else {
-                        self.output = "Invalid number".into();
+                    } else if !*max_is_set {
+                        if let Ok(max_val) = buffer.parse::<i8>() {
+                            // *max = max_val;
+                            // *max_is_set = true;
+                            match dice_generation::custom_dice(*min, max_val) {
+                                Ok(generated_result) => {
+                                    self.output =
+                                        format!("Custom Dice ({min_ran} - {max_val}): {generated_result}", min_ran = *min);
+                                }
+                                Err(err_string) => {
+                                    self.output = err_string;
+                                }
+                            }
+                            self.state = AppState::Menu;
+                            // TODO: add the option to repeat a previous custom throw
+                        } else {
+                            self.output = "Invalid number".into();
+                            self.state = AppState::Menu;
+                        }
                     }
-                    self.state = AppState::Menu;
                 }
                 KeyCode::Esc => {
                     self.state = AppState::Menu;
@@ -175,9 +205,23 @@ impl StatefulWidget for &App {
         );
 
         // Determine main content text
-        let main_text = match &self.state {
+        let main_text: String = match &self.state {
             AppState::Menu => self.output.clone(),
-            AppState::InputCustomDice { buffer } => format!("Enter number of sides: {}", &buffer),
+            AppState::InputCustomDice {
+                buffer,
+                min,
+                max: _,
+                min_is_set,
+                max_is_set,
+            } => {
+                if !min_is_set {
+                    format!("Enter the minimum value: {}", &buffer)
+                } else if !max_is_set {
+                    format!("Enter the minimum value: {min}\nEnter the maximum value: {}", &buffer)
+                } else {
+                    self.output.clone()
+                }
+            }
         };
         // Render output pane
         let mut output_block = Block::default()
