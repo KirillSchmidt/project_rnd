@@ -104,48 +104,50 @@ impl App {
                 max: _,
                 min_is_set,
                 max_is_set,
-            } => match key_event.code {
-                KeyCode::Char(c) if c.is_ascii_digit() => buffer.push(c), // TODO: add the ability to enter a negative value
-                KeyCode::Backspace => {
-                    buffer.pop();
-                }
-                KeyCode::Enter => {
-                    if !*min_is_set {
-                        if let Ok(min_val) = buffer.parse::<i8>() {
-                            *min = min_val;
-                            *min_is_set = true;
-                            buffer.clear();
-                        } else {
-                            self.output = "Invalid number".into();
-                            self.state = AppState::Menu;
-                        }
-                    } else if !*max_is_set {
-                        if let Ok(max_val) = buffer.parse::<i8>() {
-                            // *max = max_val;
-                            // *max_is_set = true;
-                            match dice_generation::custom_dice(*min, max_val) {
-                                Ok(generated_result) => {
-                                    self.output =
-                                        format!("Custom Dice ({min_ran} - {max_val}): {generated_result}", min_ran = *min);
-                                }
-                                Err(err_string) => {
-                                    self.output = err_string;
-                                }
+            } => {
+                match key_event.code {
+                    KeyCode::Char(c) if c.is_ascii_digit() => buffer.push(c), // TODO: add the ability to enter a negative value
+                    KeyCode::Backspace => {
+                        buffer.pop();
+                    }
+                    KeyCode::Enter => {
+                        if !*min_is_set {
+                            if let Ok(min_val) = buffer.parse::<i8>() {
+                                *min = min_val;
+                                *min_is_set = true;
+                                buffer.clear();
+                            } else {
+                                self.output = "Invalid number".into();
+                                self.state = AppState::Menu;
                             }
-                            self.state = AppState::Menu;
-                            // TODO: add the option to repeat a previous custom throw
-                        } else {
-                            self.output = "Invalid number".into();
-                            self.state = AppState::Menu;
+                        } else if !*max_is_set {
+                            if let Ok(max_val) = buffer.parse::<i8>() {
+                                // *max = max_val;
+                                // *max_is_set = true;
+                                match dice_generation::custom_dice(*min, max_val) {
+                                    Ok(generated_result) => {
+                                        self.output =
+                                        format!("Custom Dice ({min_ran} - {max_val}): {generated_result}", min_ran = *min);
+                                    }
+                                    Err(err_string) => {
+                                        self.output = err_string;
+                                    }
+                                }
+                                self.state = AppState::Menu;
+                                // TODO: add the option to repeat a previous custom throw
+                            } else {
+                                self.output = "Invalid number".into();
+                                self.state = AppState::Menu;
+                            }
                         }
                     }
+                    KeyCode::Esc => {
+                        self.state = AppState::Menu;
+                        self.output = "Cancelled".into();
+                    }
+                    _ => {}
                 }
-                KeyCode::Esc => {
-                    self.state = AppState::Menu;
-                    self.output = "Cancelled".into();
-                }
-                _ => {}
-            },
+            }
         }
     }
 
@@ -217,7 +219,10 @@ impl StatefulWidget for &App {
                 if !min_is_set {
                     format!("Enter the minimum value: {}", &buffer)
                 } else if !max_is_set {
-                    format!("Enter the minimum value: {min}\nEnter the maximum value: {}", &buffer)
+                    format!(
+                        "Enter the minimum value: {min}\nEnter the maximum value: {}",
+                        &buffer
+                    )
                 } else {
                     self.output.clone()
                 }

@@ -27,10 +27,16 @@ pub fn custom_dice(min: i8, max: i8) -> Result<i8, String> {
             min
         ))
     } else if max == min + 1 {
-        Err(format!("You might as well just flip a coin\n(it's {} btw)", generate_dice_result(min, max)))
+        Err(format!(
+            "You might as well just flip a coin\n(it's {} btw)",
+            generate_dice_result(min, max)
+        ))
     } else if max == min + 5 {
-        Err(format!("You might as well just use a standard dice\n(it's {} btw)", generate_dice_result(min, max)))
+        Err(format!(
+            "You might as well just use a standard dice\n(it's {} btw)",
+            generate_dice_result(min, max)
+        ))
     } else {
         Ok(generate_dice_result(min, max))
-    }
+    };
 }

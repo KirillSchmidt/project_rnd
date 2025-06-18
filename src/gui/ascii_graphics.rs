@@ -20,14 +20,17 @@ pub fn get_ascii_of_image(filepath: Box<Path>) -> Result<String, String> {
         Err(format!("{:#?} is not a file", fp_os_str))
     } else if let Some(ext) = filepath.extension() {
         if ext != required_extension {
-            Err(format!("{:#?} should have had extension {:#?}, not {:#?}", fp_os_str, required_extension, ext))
+            Err(format!(
+                "{:#?} should have had extension {:#?}, not {:#?}",
+                fp_os_str, required_extension, ext
+            ))
         } else {
             Err(format!("Can't parse extension in {:#?}", fp_os_str))
         }
     } else {
         let img = image::open(filepath).expect("Failed to open an image");
         Ok(artem::convert(img, &create_config()))
-    }
+    };
 }
 
 pub fn get_ascii_of_standard_dice(side: u8) -> Result<String, String> {
